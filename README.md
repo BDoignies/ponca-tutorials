@@ -7,6 +7,7 @@ This repository holds some code and tutorials to use [Ponca](https://poncateam.g
 ### MarchingCube (Surface reconstruction) 
 
 * `tutorials/MarchingCube/igl/`: Usage of [libigl](https://libigl.github.io/) marching cube implementation to reconstruct a surface. 
+* `tutorials/MarchingCube/cgal/`: Usage of [CGAL](https://www.cgal.org/) (>= 6.1, [3D Isosurfacing](https://doc.cgal.org/latest/Isosurfacing_3/index.html) package) marching cube implementation to reconstruct a surface.
 
 ## Building the tutorials
 

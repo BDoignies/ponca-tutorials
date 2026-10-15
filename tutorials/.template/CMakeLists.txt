@@ -8,6 +8,11 @@ if (NOT DEFINED PONCA_TUTORIALS_VERBOSE)
     option(PONCA_TUTORIALS_VERBOSE "Enable verbose output in tutorials" ON)
 endif()
 
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
+
 set(CMAKE_CXX_STANDARD 20)
 
 CPMAddPackage("gh:CLIUtils/CLI11@2.6.2")
