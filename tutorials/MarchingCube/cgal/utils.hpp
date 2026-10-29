@@ -15,6 +15,21 @@ inline auto since(std::chrono::time_point<clock_t, duration_t> const& start)
     return std::chrono::duration_cast<result_t>(clock_t::now() - start);
 }
 
+struct ScoppedTimer
+{
+    ScoppedTimer(const std::string& message) : message(message) {}
+
+    ~ScoppedTimer()
+    {
+#ifdef VERBOSE
+        std::cout << "[INFO] " << message << since(start).count() << " ms." << std::endl;
+#endif
+    }
+
+    const std::string message;
+    const std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+};
+
 template <typename Point, typename PointContainer>
 inline std::pair<typename Point::VectorType, typename Point::VectorType> GetBounds(const PointContainer& container)
 {
@@ -85,6 +100,37 @@ inline KDTree ReadPLY(const std::string& filename)
     std::cout << "[INFO] KDTree built in " << since(startKDTree).count() << " ms.\n";
 #endif
     return tree;
+}
+
+template <typename Point, typename T, typename Getter>
+inline void WritePLYVector(happly::Element& element, const std::string& prefix, const std::vector<T>& data,
+                           Getter&& getter)
+{
+    static const std::array<std::string, 3> Axes3D = {"x", "y", "z"};
+
+    for (unsigned int d = 0; d < Point::Dim; ++d)
+    {
+        const std::string name = prefix + ((Point::Dim == 3) ? Axes3D[d] : std::to_string(d));
+
+        std::vector<typename Point::Scalar> component(data.size());
+        for (size_t i = 0; i < data.size(); ++i)
+            component[i] = getter(data, i, d);
+        element.addProperty<typename Point::Scalar>(name, component);
+    }
+}
+
+template <typename Point>
+inline void WritePLYPoints(happly::Element& element, const std::vector<Point>& data)
+{
+    WritePLYVector<Point>(element, "", data, [](const auto& p, size_t i, size_t d) { return p[i].pos()(d); });
+    WritePLYVector<Point>(element, "n", data, [](const auto& p, size_t i, size_t d) { return p[i].normal()(d); });
+}
+
+template <typename Point>
+inline void WritePLYVector(happly::Element& element, const std::string& prefix,
+                           const std::vector<typename Point::VectorType>& data)
+{
+    WritePLYVector<Point>(element, prefix, data, [](const auto& v, size_t i, size_t d) { return v[i](d); });
 }
 
 #include <CLI/CLI.hpp>

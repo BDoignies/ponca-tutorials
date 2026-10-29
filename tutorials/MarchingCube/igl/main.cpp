@@ -54,23 +54,26 @@ int Perform(const BaseOptions& options, const GridOptions<Point>& gridopts, cons
         auto now = std::chrono::steady_clock::now();
 
         std::vector<Scalar> potentials(gridPoints.size());
-
-#pragma omp parallel for
-        for (std::size_t i = 0; i < gridPoints.size(); ++i)
         {
-            const auto& location = gridPoints[i];
+            ScoppedTimer timer(std::string("Running ") + method.name + " took: ");
+#pragma omp parallel for
+            for (std::size_t i = 0; i < gridPoints.size(); ++i)
+            {
+                const auto& location = gridPoints[i];
 
-            auto fit = method.object;
-            fit.init();
-            fit.setNeighborFilter({location, scale});
-            bool stable = fit.computeWithIds(points.rangeNeighbors(location, scale), points.points()) == Ponca::STABLE;
-            // igl's marching cube does not emit geometry for cubes of 0s...
-            // You may want to filter cubes for which all corners are stable,
-            // but this is outside the scope of this tutorial
-            potentials[i] = stable ? fit.potential() : Scalar(0);
+                auto fit = method.object;
+                fit.init();
+                fit.setNeighborFilter({location, scale});
+                bool stable =
+                    fit.computeWithIds(points.rangeNeighbors(location, scale), points.points()) == Ponca::STABLE;
+                // igl's marching cube does not emit geometry for cubes of 0s...
+                // You may want to filter cubes for which all corners are stable,
+                // but this is outside the scope of this tutorial
+                potentials[i] = stable ? fit.potential() : Scalar(0);
 
-            if (!fit.isSigned())
-                potentials[i] = std::abs(potentials[i]);
+                if (!fit.isSigned())
+                    potentials[i] = std::abs(potentials[i]);
+            }
         }
 
 #ifdef VERBOSE

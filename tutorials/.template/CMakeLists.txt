@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-set(PROJECT_NAME ponca-marchingcube-igl)
+set(PROJECT_NAME ponca-tuto)
 
 project(${PROJECT_NAME})
 include(CPM.cmake)

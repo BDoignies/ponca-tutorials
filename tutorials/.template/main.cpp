@@ -4,14 +4,13 @@
 using Scalar                      = float;
 static constexpr unsigned int Dim = 3;
 using Point                       = Ponca::PointPositionNormal<Scalar, Dim>;
-using KDTree                      = Ponca::KdTreeDense<Point>;
-using WeightFilter                = Ponca::DistWeightFunc<Point, Ponca::SmoothWeightKernel<Scalar>>;
+using VectorType                  = typename Point::VectorType;
+using KDTree                      = Ponca::KdTreeSparse<Point>;
+using WeightFilter                = Ponca::DistWeightFilter<Point, Ponca::SmoothWeightKernel<Scalar>>;
 
-void Perform(const BaseOptions& options, const KDTree& points)
-{
-    const auto [min, max] = GetBounds<Point>(points.points());
-    /* TOTO */
-}
+using Factory = Ponca::Factory<Point, WeightFilter, Ponca::FitSpaceDer>;
+
+void Perform(const BaseOptions& options, const KDTree& points) { /* TODO */ }
 
 int main(int argc, char** argv)
 {

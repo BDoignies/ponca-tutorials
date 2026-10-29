@@ -1,1 +1,2 @@
 add_subdirectory(MarchingCube)
+add_subdirectory(Curvature)

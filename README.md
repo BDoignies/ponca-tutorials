@@ -9,6 +9,10 @@ This repository holds some code and tutorials to use [Ponca](https://poncateam.g
 * `tutorials/MarchingCube/igl/`: Usage of [libigl](https://libigl.github.io/) marching cube implementation to reconstruct a surface. 
 * `tutorials/MarchingCube/cgal/`: Usage of [CGAL](https://www.cgal.org/) (>= 6.1, [3D Isosurfacing](https://doc.cgal.org/latest/Isosurfacing_3/index.html) package) marching cube implementation to reconstruct a surface.
 
+### Curvature estimation
+
+* `tutorials/Curvature`: Estimates of principal curvatures and their direction with plain ponca. 
+
 ## Building the tutorials
 
 The tutorials are written in C++ and need to be built before running. Only [CMake](https://cmake.org/) and a C++ compiler are required; every other dependency (including Ponca) will be downloaded and linked automatically.

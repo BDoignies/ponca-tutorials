@@ -63,23 +63,26 @@ int Perform(const BaseOptions& options, const GridOptions<Point>& gridopts, cons
         auto now = std::chrono::steady_clock::now();
 
         std::vector<Scalar> potentials(gridPoints.size());
-
-#pragma omp parallel for
-        for (std::size_t i = 0; i < gridPoints.size(); ++i)
         {
-            const auto& location = gridPoints[i];
+            ScoppedTimer timer(std::string("Running ") + method.name + " took: ");
+#pragma omp parallel for
+            for (std::size_t i = 0; i < gridPoints.size(); ++i)
+            {
+                const auto& location = gridPoints[i];
 
-            auto fit = method.object;
-            fit.init();
-            fit.setNeighborFilter({location, scale});
-            bool stable = fit.computeWithIds(points.rangeNeighbors(location, scale), points.points()) == Ponca::STABLE;
-            // CGAL's marching cube does not emit geometry for cubes of 0s...
-            // You may want to filter cubes for which all corners are stable,
-            // but this is outside the scope of this tutorial
-            potentials[i] = stable ? fit.potential() : Scalar(0);
+                auto fit = method.object;
+                fit.init();
+                fit.setNeighborFilter({location, scale});
+                bool stable =
+                    fit.computeWithIds(points.rangeNeighbors(location, scale), points.points()) == Ponca::STABLE;
+                // CGAL's marching cube does not emit geometry for cubes of 0s...
+                // You may want to filter cubes for which all corners are stable,
+                // but this is outside the scope of this tutorial
+                potentials[i] = stable ? fit.potential() : Scalar(0);
 
-            if (!fit.isSigned())
-                potentials[i] = std::abs(potentials[i]);
+                if (!fit.isSigned())
+                    potentials[i] = std::abs(potentials[i]);
+            }
         }
 
 #ifdef VERBOSE
@@ -94,8 +97,8 @@ int Perform(const BaseOptions& options, const GridOptions<Point>& gridopts, cons
         const Grid grid{Kernel::Point_3(first.x(), first.y(), first.z()), Kernel::Point_3(last.x(), last.y(), last.z()),
                         std::array<std::size_t, Dim>{gridDims[0], gridDims[1], gridDims[2]}};
 
-        // Note: We could have fill `values` automatically, instead of allocating and filling potential. 
-        // However, this is a better match of other MarchingCube tutorials in this repository. 
+        // Note: We could have fill `values` automatically, instead of allocating and filling potential.
+        // However, this is a better match of other MarchingCube tutorials in this repository.
         Values values{grid};
         for (std::size_t i = 0; i < gridPoints.size(); ++i)
             values(i % gridDims[0], (i / gridDims[0]) % gridDims[1], i / (gridDims[0] * gridDims[1])) = potentials[i];
